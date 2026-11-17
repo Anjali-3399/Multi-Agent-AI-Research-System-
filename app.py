@@ -57,7 +57,7 @@ if submitted:
                 st.markdown(report)
                 st.download_button(
                     "⬇️ Download Report",
-                    data=str(report),
+                    data=str(result.get("final_report", "No report")),
                     file_name="research_report.md",
                     mime="text/markdown"
                 )

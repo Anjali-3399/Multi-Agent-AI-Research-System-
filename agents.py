@@ -63,18 +63,26 @@ LIMITATIONS:
     )
   
 #writer chain
-writer_prompt=ChatPromptTemplate.from_messages([
+
+writer_prompt = ChatPromptTemplate.from_messages([
   ("system", """You are a strict evidence-based research writer.
-Use ONLY facts explicitly supported by the provided research.
-Never invent facts, statistics, dates, authors, studies, DOIs, or URLs.
-If a claim cannot be verified from the research, omit it or label it "Not verified".
-Use only URLs explicitly present in the research.
+
+Use ONLY the successfully scraped source evidence provided.
+Do not use search snippets, unscraped URLs, YouTube pages, or outside knowledge.
+Do not name authors, years, organizations, or publication details unless they appear directly in the scraped evidence.
+Do not convert a cited reference into the author of the article.
+If a source is not successfully scraped, do not include it in the report or Sources section.
+If a claim cannot be supported by the scraped evidence, omit it or label it "Not verified".
+
+Use only URLs explicitly present in the successfully scraped source evidence.
 Every source in the Sources section must use an exact URL found in the provided research.
-Never invent citations, author names, publication years, DOIs
-, or article titles. If source details are unavailable, list only the verified URL.
+Never invent citations, author names, publication years, DOIs, or article titles.
+If source details are unavailable, list only the verified URL.
 Do not invent source titles or publication details.
+
 Clearly distinguish evidence from general explanation.
 If the research is insufficient, state that limitation honestly.
+
 A source may be included in the Sources section only if:
 - Its scraping status is Successful.
 - Its evidence supports at least one claim in the report.
@@ -86,19 +94,18 @@ Do not make conclusions that go beyond the provided evidence."""),
 
 Topic: {topic}
 
-Research Gathered:
+Successfully Scraped Source Evidence:
 {research}
 
 Structure the report as:
 - Introduction
 - Key Findings (minimum 3 well-explained points)
 - Conclusion
-- Sources (list all URLs found in the research)
+- Sources (list only successfully scraped URLs that support claims in the report)
 
-Be detailed, factual and professional."""),
+Be detailed, factual, professional, and concise."""),
 ])
-
-writer_chain = writer_prompt| llm |StrOutputParser()
+writer_chain = writer_prompt | llm | StrOutputParser()
 
 
 # Source verification chain
@@ -326,7 +333,9 @@ RULES:
 5. Improve clarity, grammar, structure, and readability.
 6. Remove unnecessary repetition.
 7. Improve the introduction and conclusion using only information already supported by the report and verification.
-8. Do not invent facts, statistics, dates, examples, or sources.
+8.Do not add new examples, applications, statistics, facts, or generalizations.
+9.Use only information already supported by the original report and verification results.
+10.If a claim is unsupported, remove it instead of replacing it with a new claim.
 
 Return your response in this exact format:
 

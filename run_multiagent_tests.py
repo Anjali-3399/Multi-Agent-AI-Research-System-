@@ -9,8 +9,8 @@ with open("test_topics.txt", "r", encoding="utf-8") as file:
 
 results = []
 
-# First test only one topic
-TEST_LIMIT = 1
+# test all 10 topics
+TEST_LIMIT = 10
 
 for index, topic in enumerate(topics[:TEST_LIMIT], start=1):
 
